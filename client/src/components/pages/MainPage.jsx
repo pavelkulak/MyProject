@@ -38,12 +38,8 @@ const MainPage = ({ user }) => {
     if (!user) {
       setOpen(true); // Показать предупреждение, если пользователь не авторизован
     } else {
-      console.log("Переход к рецептам...");
+      navigate("/CocktailSearch"); // Переход к странице поиска рецептов
     }
-  };
-
-  const handleCardClick = (id) => {
-    navigate(`/cocktail/${id}`); // Переход к странице деталей коктейля по id
   };
 
   const handleClose = () => {
@@ -82,7 +78,7 @@ const MainPage = ({ user }) => {
             },
           }}
           size="large"
-          onClick={handleExploreClick}
+          onClick={handleExploreClick} // Переход к странице поиска рецептов
         >
           Explore Recipes
         </Button>
@@ -102,7 +98,7 @@ const MainPage = ({ user }) => {
                   transform: "scale(1.05)",
                 },
               }}
-              onClick={() => handleCardClick(cocktail.idDrink)} // Обработчик клика для перехода к рецепту
+              onClick={() => navigate(`/cocktail/${cocktail.idDrink}`)} // Переход к странице деталей коктейля
             >
               <CardMedia
                 component="img"

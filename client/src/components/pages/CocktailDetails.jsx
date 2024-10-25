@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import {
-  Typography,
-  Container,
-  CardMedia,
-  CardContent,
-  Card,
-} from "@mui/material";
+import axiosInstance from "../../axiosInstance";
+import { Typography, Container, CardMedia, CardContent, Card, IconButton } from "@mui/material";
+import { Favorite, FavoriteBorder } from "@mui/icons-material";
 
-const CocktailDetails = () => {
-  const { id } = useParams(); // получаем ID коктейля из URL
+const CocktailDetails = ({ user }) => {
+  const { id } = useParams();
   const [cocktail, setCocktail] = useState(null);
+  const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
     const fetchCocktailDetails = async () => {
@@ -25,8 +22,32 @@ const CocktailDetails = () => {
       }
     };
 
+    const checkIfLiked = async () => {
+      const response = await axiosInstance.get(`/likes/${user.id}/${id}`);
+      setIsLiked(response.data.isLiked);
+    };
+
     fetchCocktailDetails();
-  }, [id]);
+    if (user) checkIfLiked();
+  }, [id, user]);
+
+  const handleLikeToggle = async () => {
+    try {
+      if (isLiked) {
+        await axiosInstance.delete(`/likes/${id}`, { data: { userId: user.id } });
+      } else {
+        await axiosInstance.post('/likes', {
+          userId: user.id,
+          cocktailId: id,
+          cocktailName: cocktail.strDrink,
+          cocktailImageUrl: cocktail.strDrinkThumb,
+        });
+      }
+      setIsLiked(!isLiked);
+    } catch (err) {
+      console.error("Error toggling like:", err);
+    }
+  };
 
   if (!cocktail) {
     return <Typography>Loading...</Typography>;
@@ -49,6 +70,7 @@ const CocktailDetails = () => {
           backgroundColor: "#ffccbc",
           borderRadius: "8px",
           boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+          position: "relative",
         }}
       >
         <CardMedia
@@ -78,6 +100,22 @@ const CocktailDetails = () => {
 
           <Typography variant="h6">Instructions:</Typography>
           <Typography variant="body1">{cocktail.strInstructions}</Typography>
+
+          <IconButton
+            onClick={handleLikeToggle}
+            sx={{
+              color: isLiked ? "#ff4081" : "#fff",
+              position: "absolute",
+              top: 16,
+              right: 16,
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.3)",
+              },
+            }}
+          >
+            {isLiked ? <Favorite /> : <FavoriteBorder />}
+          </IconButton>
         </CardContent>
       </Card>
     </Container>

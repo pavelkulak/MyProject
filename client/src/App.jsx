@@ -8,10 +8,24 @@ import { useState, useEffect } from "react";
 
 import CocktailSearch from "./components/pages/CoctailSearch";
 import CocktailDetails from "./components/pages/CocktailDetails";
+import UserPage from "./components/pages/UserPage";
 
 function App() {
   const [user, setUser] = useState();
   const [errorMessage, setErrorMessage] = useState("");
+  const [likedCocktails, setLikedCocktails] = useState([]);
+
+  const addToFavorites = (cocktail) => {
+    setLikedCocktails((prev) => {
+      // Проверка, если коктейль уже в списке
+      if (
+        prev.some((favCocktail) => favCocktail.idDrink === cocktail.idDrink)
+      ) {
+        return prev; // Если коктейль уже в избранном, не добавляем его снова
+      }
+      return [...prev, cocktail];
+    });
+  };
 
   useEffect(() => {
     axiosInstance("/tokens/refresh")
@@ -72,7 +86,7 @@ function App() {
       children: [
         {
           path: "/",
-          element: <MainPage />,
+          element: <MainPage user={user} />,
         },
         {
           path: "/signup",
@@ -94,12 +108,16 @@ function App() {
         },
         {
           path: "/CocktailSearch",
-          element: <CocktailSearch user={user} />,
+          element: <CocktailSearch user={user} addToFavorites={addToFavorites} likedCocktails={likedCocktails}/>,
         },
         // Новый маршрут для отображения деталей коктейля
         {
           path: "/cocktail/:id", // динамический маршрут с параметром id
-          element: <CocktailDetails user={user} />,
+          element: <CocktailDetails user={user} addToFavorites={addToFavorites} likedCocktails={likedCocktails} removeFromFavorites={removeFromFavorites}/>,
+        },
+        {
+          path: "UserPage",
+          element: <UserPage user={user} likedCocktails={likedCocktails} />,
         },
       ],
     },

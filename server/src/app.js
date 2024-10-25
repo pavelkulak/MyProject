@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const cookieParser = require('cookie-parser');
 const app = express();
 const authRouter = require('../routers/auth.router');
+const likeRoutes = require('../routers/likes.router')
 
 const cors = require('cors');
 const tokensRouter = require('../routers/token.router');
@@ -21,6 +22,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use('/api/auth', authRouter);
 app.use('/api/tokens', tokensRouter)
+app.use('/api/', likeRoutes)
 
 app.listen(PORT, () => {
     console.log(`Server started at ${PORT}`)

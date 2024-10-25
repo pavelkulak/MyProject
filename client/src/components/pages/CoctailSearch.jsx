@@ -16,6 +16,7 @@ const CocktailSearch = () => {
   const [ingredient, setIngredient] = useState('');
   const [cocktails, setCocktails] = useState([]);
   const [error, setError] = useState(null);
+  const [noResults, setNoResults] = useState(false); // Для обработки отсутствия коктейлей
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -25,10 +26,19 @@ const CocktailSearch = () => {
   const fetchCocktails = async () => {
     try {
       setError(null);
+      setNoResults(false);
       const response = await axios.get(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${ingredient}`);
-      setCocktails(response.data.drinks || []);
+
+      // Проверяем, что response.data.drinks является массивом
+      if (Array.isArray(response.data.drinks)) {
+        setCocktails(response.data.drinks);
+      } else {
+        setNoResults(true); // Если коктейли не найдены
+        setCocktails([]);
+      }
     } catch (err) {
       setError('Error fetching data, please try again.');
+      setCocktails([]); // Если произошла ошибка, сбрасываем массив коктейлей
     }
   };
 
@@ -81,42 +91,52 @@ const CocktailSearch = () => {
         </Button>
       </form>
 
+      {/* Если произошла ошибка, показываем ее */}
       {error && (
         <Typography color="error" align="center" variant="body2">
           {error}
         </Typography>
       )}
 
+      {/* Если коктейлей не найдено, показываем сообщение */}
+      {noResults && (
+        <Typography align="center" variant="body2" color="error">
+          No cocktails found for the specified ingredient.
+        </Typography>
+      )}
+
       <Grid container spacing={3} justifyContent="center">
-        {cocktails.map((cocktail) => (
-          <Grid item xs={12} sm={6} md={4} key={cocktail.idDrink}>
-            <Card
-              onClick={() => handleCardClick(cocktail.idDrink)}
-              sx={{
-                backgroundColor: "#ffccbc",
-                borderRadius: "8px",
-                boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-                transition: "transform 0.2s ease-in-out",
-                cursor: 'pointer',
-                "&:hover": {
-                  transform: "scale(1.05)",
-                },
-              }}
-            >
-              <CardMedia
-                component="img"
-                height="200"
-                image={cocktail.strDrinkThumb}
-                alt={cocktail.strDrink}
-              />
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="h6">
-                  {cocktail.strDrink}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+        {cocktails && Array.isArray(cocktails) && cocktails.length > 0 && (
+          cocktails.map((cocktail) => (
+            <Grid item xs={12} sm={6} md={4} key={cocktail.idDrink}>
+              <Card
+                onClick={() => handleCardClick(cocktail.idDrink)}
+                sx={{
+                  backgroundColor: "#ffccbc",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+                  transition: "transform 0.2s ease-in-out",
+                  cursor: 'pointer',
+                  "&:hover": {
+                    transform: "scale(1.05)",
+                  },
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={cocktail.strDrinkThumb}
+                  alt={cocktail.strDrink}
+                />
+                <CardContent sx={{ textAlign: 'center' }}>
+                  <Typography variant="h6">
+                    {cocktail.strDrink}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))
+        )}
       </Grid>
     </Container>
   );

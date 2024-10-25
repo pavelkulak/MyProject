@@ -6,8 +6,16 @@ import Button from "@mui/material/Button";
 import HomeIcon from "@mui/icons-material/Home";
 import WhatshotIcon from "@mui/icons-material/Whatshot";
 import GrainIcon from "@mui/icons-material/Grain";
+import { useNavigate } from "react-router-dom"; // Импортируем useNavigate
 
 export default function NavBar({ user, logoutHandler }) {
+  const navigate = useNavigate(); // Используем хук для навигации
+
+  const handleLogout = async () => {
+    await logoutHandler(); // Выполняем функцию выхода
+    navigate("/"); // Перенаправляем на главную страницу
+  };
+
   return (
     <div
       style={{
@@ -75,16 +83,15 @@ export default function NavBar({ user, logoutHandler }) {
             <Typography
               sx={{
                 color: "#fff",
-                fontSize: "1.2rem", // Немного увеличиваем размер шрифта
-                fontWeight: "bold", // Делаем текст жирным
-                textShadow: "1px 1px 2px rgba(0, 0, 0, 0.2)", // Добавляем легкую тень для контраста
-                
+                fontSize: "1.2rem",
+                fontWeight: "bold",
+                textShadow: "1px 1px 2px rgba(0, 0, 0, 0.2)",
               }}
             >
               Welcome, <span>{user.username}</span>!
             </Typography>
             <Button
-              onClick={logoutHandler}
+              onClick={handleLogout} // Используем новую функцию для выхода
               variant="outlined"
               sx={{
                 borderColor: "#fff",
