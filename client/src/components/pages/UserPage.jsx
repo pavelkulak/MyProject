@@ -1,22 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Grid, Card, CardContent, CardMedia, Typography, IconButton, Container } from '@mui/material';
-import { Delete } from '@mui/icons-material';
+import React, { useEffect, useState } from "react";
+import axiosInstance from "../../axiosInstance";
+import {
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  IconButton,
+  Container,
+} from "@mui/material";
+import { Delete } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom"; // Импортируем useNavigate
 
 const UserPage = ({ user }) => {
   const [likedCocktails, setLikedCocktails] = useState([]);
+  const navigate = useNavigate(); // Инициализируем навигацию
 
   useEffect(() => {
     const fetchLikedCocktails = async () => {
-      const response = await axios.get(`/api/likes/${user.id}`);
-      setLikedCocktails(response.data);
+      try {
+        const response = await axiosInstance.get(`/likes/${user.id}`);
+        setLikedCocktails(response.data);
+      } catch (error) {
+        console.error("Ошибка при получении лайкнутых коктейлей:", error);
+      }
     };
+
     if (user) fetchLikedCocktails();
   }, [user]);
 
   const handleDelete = async (cocktailId) => {
-    await axios.delete(`/api/likes/${cocktailId}`, { data: { userId: user.id } });
-    setLikedCocktails((prev) => prev.filter((cocktail) => cocktail.cocktail_id !== cocktailId));
+    try {
+      await axiosInstance.delete(`/likes/${cocktailId}`, {
+        data: { userId: user.id },
+      });
+
+      setLikedCocktails((prev) =>
+        prev.filter((cocktail) => cocktail.cocktailId !== cocktailId)
+      );
+    } catch (error) {
+      console.error("Ошибка при удалении лайка:", error);
+    }
+  };
+
+  const handleCardClick = (cocktailId) => {
+    navigate(`/cocktail/${cocktailId}`);
   };
 
   return (
@@ -26,16 +54,40 @@ const UserPage = ({ user }) => {
       </Typography>
       <Grid container spacing={3}>
         {likedCocktails.map((cocktail) => (
-          <Grid item xs={12} sm={6} md={4} key={cocktail.cocktail_id}>
-            <Card sx={{ position: 'relative' }}>
-              <CardMedia component="img" height="200" image={cocktail.cocktail_image_url} alt={cocktail.cocktail_name} />
+          <Grid item xs={12} sm={6} md={4} key={cocktail.cocktailId}>
+            <Card
+              sx={{ position: "relative", cursor: "pointer" }}
+              onClick={() => handleCardClick(cocktail.cocktailId)} // Обработчик для перехода
+            >
+              <CardMedia
+                component="img"
+                height="200"
+                image={cocktail.cocktailImageUrl}
+                alt={cocktail.cocktailName}
+              />
               <CardContent>
-                <Typography variant="h6" align="center">{cocktail.cocktail_name}</Typography>
+                <Typography variant="h6" align="center">
+                  {cocktail.cocktailName}
+                </Typography>
                 <IconButton
-                  onClick={() => handleDelete(cocktail.cocktail_id)}
-                  sx={{ color: 'red', position: 'absolute', top: 8, right: 8 }}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Предотвращаем переход при нажатии на кнопку удаления
+                    handleDelete(cocktail.cocktailId);
+                  }}
+                  sx={{
+                    color: "white",
+                    backgroundColor: "black",
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    "&:hover": {
+                      backgroundColor: "black",
+                    },
+                    width: 32,
+                    height: 32,
+                  }}
                 >
-                  <Delete />
+                  <Delete fontSize="small" />
                 </IconButton>
               </CardContent>
             </Card>

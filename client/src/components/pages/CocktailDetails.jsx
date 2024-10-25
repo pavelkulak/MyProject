@@ -2,10 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import axiosInstance from "../../axiosInstance";
-import { Typography, Container, CardMedia, CardContent, Card, IconButton } from "@mui/material";
+import {
+  Typography,
+  Container,
+  CardMedia,
+  CardContent,
+  Card,
+  IconButton,
+} from "@mui/material";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
 
-const CocktailDetails = ({ user }) => {
+const CocktailDetails = ({ user, addToFavorites, removeFromFavorites }) => {
   const { id } = useParams();
   const [cocktail, setCocktail] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
@@ -22,9 +29,14 @@ const CocktailDetails = ({ user }) => {
       }
     };
 
+    // Проверяем, лайкнут ли коктейль на сервере
     const checkIfLiked = async () => {
-      const response = await axiosInstance.get(`/likes/${user.id}/${id}`);
-      setIsLiked(response.data.isLiked);
+      try {
+        const response = await axiosInstance.get(`/likes/${user.id}/${id}`);
+        setIsLiked(response.data.isLiked); // Сервер должен возвращать { isLiked: true/false }
+      } catch (err) {
+        console.error("Error checking like status:", err);
+      }
     };
 
     fetchCocktailDetails();
@@ -34,16 +46,25 @@ const CocktailDetails = ({ user }) => {
   const handleLikeToggle = async () => {
     try {
       if (isLiked) {
-        await axiosInstance.delete(`/likes/${id}`, { data: { userId: user.id } });
+        await axiosInstance.delete(`/likes/${id}`, {
+          data: { userId: user.id },
+        });
+        removeFromFavorites(id);
+        setIsLiked(false);
       } else {
-        await axiosInstance.post('/likes', {
+        await axiosInstance.post("/likes", {
           userId: user.id,
           cocktailId: id,
           cocktailName: cocktail.strDrink,
           cocktailImageUrl: cocktail.strDrinkThumb,
         });
+        addToFavorites({
+          idDrink: id,
+          strDrink: cocktail.strDrink,
+          strDrinkThumb: cocktail.strDrinkThumb,
+        });
+        setIsLiked(true);
       }
-      setIsLiked(!isLiked);
     } catch (err) {
       console.error("Error toggling like:", err);
     }
@@ -83,7 +104,6 @@ const CocktailDetails = ({ user }) => {
           <Typography variant="h4" align="center" gutterBottom>
             {cocktail.strDrink}
           </Typography>
-
           <Typography variant="h6">Ingredients:</Typography>
           <ul>
             {[...Array(15)].map((_, i) => {
@@ -97,10 +117,8 @@ const CocktailDetails = ({ user }) => {
               ) : null;
             })}
           </ul>
-
           <Typography variant="h6">Instructions:</Typography>
           <Typography variant="body1">{cocktail.strInstructions}</Typography>
-
           <IconButton
             onClick={handleLikeToggle}
             sx={{
@@ -108,10 +126,11 @@ const CocktailDetails = ({ user }) => {
               position: "absolute",
               top: 16,
               right: 16,
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
-              "&:hover": {
-                backgroundColor: "rgba(255, 255, 255, 0.3)",
-              },
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              borderRadius: "50%",
+              padding: "8px",
+              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+              "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.7)" },
             }}
           >
             {isLiked ? <Favorite /> : <FavoriteBorder />}

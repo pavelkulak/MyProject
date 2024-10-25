@@ -4,16 +4,15 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Link from "@mui/material/Link";
 import Button from "@mui/material/Button";
 import HomeIcon from "@mui/icons-material/Home";
-import WhatshotIcon from "@mui/icons-material/Whatshot";
-import GrainIcon from "@mui/icons-material/Grain";
-import { useNavigate } from "react-router-dom"; // Импортируем useNavigate
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { useNavigate } from "react-router-dom";
 
 export default function NavBar({ user, logoutHandler }) {
-  const navigate = useNavigate(); // Используем хук для навигации
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await logoutHandler(); // Выполняем функцию выхода
-    navigate("/"); // Перенаправляем на главную страницу
+    await logoutHandler();
+    navigate("/");
   };
 
   return (
@@ -47,24 +46,20 @@ export default function NavBar({ user, logoutHandler }) {
           <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
           Main page
         </Link>
-        <Link
-          underline="hover"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            color: "#fff",
-          }}
-          href="/material-ui/getting-started/installation/"
-        >
-          <WhatshotIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-          Core
-        </Link>
-        <Typography
-          sx={{ color: "#fff", display: "flex", alignItems: "center" }}
-        >
-          <GrainIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-          Breadcrumb
-        </Typography>
+        {user && (
+          <Link
+            underline="hover"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              color: "#fff",
+            }}
+            href="/UserPage" // Ссылка на профиль, если пользователь залогинен
+          >
+            <AccountCircleIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+            Profile
+          </Link>
+        )}
       </Breadcrumbs>
 
       {/* Контейнер для кнопок */}
@@ -91,7 +86,7 @@ export default function NavBar({ user, logoutHandler }) {
               Welcome, <span>{user.username}</span>!
             </Typography>
             <Button
-              onClick={handleLogout} // Используем новую функцию для выхода
+              onClick={handleLogout}
               variant="outlined"
               sx={{
                 borderColor: "#fff",

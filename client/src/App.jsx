@@ -17,14 +17,26 @@ function App() {
 
   const addToFavorites = (cocktail) => {
     setLikedCocktails((prev) => {
-      // Проверка, если коктейль уже в списке
       if (
         prev.some((favCocktail) => favCocktail.idDrink === cocktail.idDrink)
       ) {
-        return prev; // Если коктейль уже в избранном, не добавляем его снова
+        return prev;
       }
       return [...prev, cocktail];
     });
+  };
+
+  const removeFromFavorites = async (cocktailId) => {
+    try {
+      await axiosInstance.delete(`/api/likes/${cocktailId}`, {
+        data: { userId: user.id },
+      });
+      setLikedCocktails((prev) =>
+        prev.filter((favCocktail) => favCocktail.idDrink !== cocktailId)
+      );
+    } catch (error) {
+      console.error("Ошибка при удалении лайка:", error);
+    }
   };
 
   useEffect(() => {
@@ -38,6 +50,7 @@ function App() {
         setAccessToken("");
       });
   }, []);
+
   const signupHandler = async (event, navigate) => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.target));
@@ -108,16 +121,35 @@ function App() {
         },
         {
           path: "/CocktailSearch",
-          element: <CocktailSearch user={user} addToFavorites={addToFavorites} likedCocktails={likedCocktails}/>,
+          element: (
+            <CocktailSearch
+              user={user}
+              addToFavorites={addToFavorites}
+              likedCocktails={likedCocktails}
+            />
+          ),
         },
         // Новый маршрут для отображения деталей коктейля
         {
           path: "/cocktail/:id", // динамический маршрут с параметром id
-          element: <CocktailDetails user={user} addToFavorites={addToFavorites} likedCocktails={likedCocktails} removeFromFavorites={removeFromFavorites}/>,
+          element: (
+            <CocktailDetails
+              user={user}
+              addToFavorites={addToFavorites}
+              likedCocktails={likedCocktails}
+              removeFromFavorites={removeFromFavorites}
+            />
+          ),
         },
         {
           path: "UserPage",
-          element: <UserPage user={user} likedCocktails={likedCocktails} />,
+          element: (
+            <UserPage
+              user={user}
+              likedCocktails={likedCocktails}
+              removeFromFavorites={removeFromFavorites}
+            />
+          ),
         },
       ],
     },
