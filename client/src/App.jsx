@@ -6,6 +6,9 @@ import SignUpPage from "./components/pages/SignUpPage";
 import SignInPage from "./components/pages/SignInPage";
 import { useState, useEffect } from "react";
 
+import CocktailSearch from "./components/pages/CoctailSearch";
+import CocktailDetails from "./components/pages/CocktailDetails";
+
 function App() {
   const [user, setUser] = useState();
   const [errorMessage, setErrorMessage] = useState("");
@@ -63,8 +66,6 @@ function App() {
     setAccessToken("");
   };
 
-  console.log(user);
-
   const routes = [
     {
       element: <Layout user={user} logoutHandler={logoutHandler} />,
@@ -90,6 +91,15 @@ function App() {
               errorMessage={errorMessage}
             />
           ),
+        },
+        {
+          path: "/CocktailSearch",
+          element: <CocktailSearch user={user} />,
+        },
+        // Новый маршрут для отображения деталей коктейля
+        {
+          path: "/cocktail/:id", // динамический маршрут с параметром id
+          element: <CocktailDetails user={user} />,
         },
       ],
     },

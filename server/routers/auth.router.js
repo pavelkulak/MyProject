@@ -42,15 +42,15 @@ authRouter.post('/signin', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Найти пользователя по email
+
         const user = await User.findOne({ where: { email } });
 
-        // Проверка, существует ли пользователь
+
         if (!user) {
             return res.status(401).json({ message: 'Incorrect email or password' });
         }
 
-        // Сравнить введенный пароль с паролем из базы данных
+
         const isCorrectPassword = await bcrypt.compare(password, user.password);
 
         if (!isCorrectPassword) {

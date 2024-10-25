@@ -1,11 +1,12 @@
 import React from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+
 const SignUpPage = ({ signupHandler, errorMessage }) => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    await signupHandler(e, navigate); // Передаем navigate
+    await signupHandler(e, navigate);
   };
 
   return (
@@ -18,8 +19,9 @@ const SignUpPage = ({ signupHandler, errorMessage }) => {
         alignItems: "center",
         justifyContent: "center",
         width: "100%",
-        height: "100vh",
-        bgcolor: "background.paper",
+        height: "calc(100vh - 64px)", // Учитываем высоту навбара
+        background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)", // Градиентный фон
+        overflow: "hidden", // Убираем скролл
       }}
     >
       <Box
@@ -27,11 +29,12 @@ const SignUpPage = ({ signupHandler, errorMessage }) => {
           width: "100%",
           maxWidth: 400,
           p: 3,
-          boxShadow: 3,
-          borderRadius: 2,
+          backgroundColor: "#fff", // Белый фон для формы
+          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)", // Тень
+          borderRadius: 2, // Округленные углы
         }}
       >
-        <Typography variant="h4" gutterBottom align="center">
+        <Typography variant="h4" gutterBottom align="center" sx={{ color: "#FF8E53" }}>
           Sign Up
         </Typography>
 
@@ -44,21 +47,23 @@ const SignUpPage = ({ signupHandler, errorMessage }) => {
         <TextField
           name="username"
           label="Name"
-          type="input"
+          type="text"
           variant="outlined"
           fullWidth
           margin="normal"
           required
+          sx={{ backgroundColor: "#f9f9f9", borderRadius: "4px" }}
         />
 
         <TextField
           name="email"
           label="Email"
-          type="input"
+          type="email"
           variant="outlined"
           fullWidth
           margin="normal"
           required
+          sx={{ backgroundColor: "#f9f9f9", borderRadius: "4px" }}
         />
 
         <TextField
@@ -69,6 +74,7 @@ const SignUpPage = ({ signupHandler, errorMessage }) => {
           fullWidth
           margin="normal"
           required
+          sx={{ backgroundColor: "#f9f9f9", borderRadius: "4px" }}
         />
 
         <TextField
@@ -78,13 +84,21 @@ const SignUpPage = ({ signupHandler, errorMessage }) => {
           fullWidth
           margin="normal"
           required
+          sx={{ backgroundColor: "#f9f9f9", borderRadius: "4px" }}
         />
 
         <Button
           variant="contained"
-          color="primary"
           fullWidth
-          sx={{ mt: 2 }}
+          sx={{
+            mt: 2,
+            backgroundColor: "#ff4081",
+            color: "#fff",
+            padding: "10px 24px",
+            "&:hover": {
+              backgroundColor: "#f50057",
+            },
+          }}
           type="submit"
         >
           Register
